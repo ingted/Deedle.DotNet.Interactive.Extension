@@ -6,10 +6,14 @@ Repository: <https://github.com/ingted/Deedle.DotNet.Interactive.Extension>
 
 This package is built against the .NET 10 source projects in the companion [ingted/interactive](https://github.com/ingted/interactive) repository (local checkout: `G:\coldfar_py\interactive`).
 
+## Project status and support
+
+Microsoft's original [`dotnet/interactive`](https://github.com/dotnet/interactive) repository is archived and is no longer actively supported. This extension and the companion `ingted/interactive` fork provide a practical workaround for F# and Deedle users who want to keep using .NET Interactive notebooks. The maintainer intends to keep this workaround updated over the long term.
+
 ## Install
 
 ```fsharp
-#r "nuget: Deedle.DotNet.Interactive.Extension, 0.1.0-alpha12"
+#r "nuget: Deedle.DotNet.Interactive.Extension, 0.1.0-alpha13"
 
 open Deedle
 open Deedle.DotNet.Interactive.Extension
