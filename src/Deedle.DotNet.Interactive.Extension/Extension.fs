@@ -4,6 +4,7 @@ open System
 open System.Threading.Tasks
 open System.IO
 open Microsoft.DotNet.Interactive
+open Microsoft.DotNet.Interactive.Commands
 open Microsoft.DotNet.Interactive.Formatting
 open Microsoft.DotNet.Interactive.FSharp.FSharpKernelHelpers.Html
 open Deedle
@@ -268,8 +269,13 @@ type DeedleFormatterExtension() =
         )
 
     interface IKernelExtension with
-        member _.OnLoadAsync _ =
+        member _.OnLoadAsync kernel =
             registerFormatter ()
+
+            let rootKernel =
+                if isNull kernel.RootKernel then kernel else kernel.RootKernel
+
+            rootKernel.RegisterCommandType<UpdateDisplayedValue>()
 
             if isNull KernelInvocationContext.Current |> not then
                 let message =

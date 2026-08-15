@@ -19,17 +19,19 @@ module DFPrint =
         if isNull (box f) then
             nullArg (nameof f)
 
-        let currentKernel = Kernel.Current
+        let context = KernelInvocationContext.Current
 
-        if isNull currentKernel then
+        if isNull context then
             invalidOp "printDFFun must be started from a .NET Interactive cell."
+
+        let currentKernel = Kernel.Current
 
         let kernel =
             let rootKernel = Kernel.Root
             if isNull rootKernel then currentKernel else rootKernel
 
         let initialFrame = f ()
-        let displayedValue = Kernel.display (initialFrame, HtmlFormatter.MimeType)
+        let displayedValue = context.Display(initialFrame, HtmlFormatter.MimeType)
         let callbackGate = new SemaphoreSlim(1, 1)
 
         let updateDisplay (formattedValue: FormattedValue) =
