@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.1.0-alpha9</Version>
+    <Version>0.1.0-alpha11</Version>
     <IsPackable>true</IsPackable>
     <OutputType>Library</OutputType>
     <PackageDescription>Experimental Deedle formatters for dotnet interactive notebooks</PackageDescription>
@@ -26,11 +26,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="8.0.100" />
-    <PackageReference Include="Deedle" Version="8.8.8.8" />
-    <PackageReference Include="Microsoft.DotNet.Interactive" Version="1.0.0-beta.24075.1" />
-    <PackageReference Include="Microsoft.DotNet.Interactive.Formatting" Version="1.0.0-beta.24075.1" />
-    <PackageReference Include="Microsoft.DotNet.Interactive.FSharp" Version="1.0.0-beta.24075.1" />
+    <PackageReference Update="FSharp.Core" Version="10.1.201" />
+    <PackageReference Include="Deedle" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\interactive\src\Microsoft.DotNet.Interactive\Microsoft.DotNet.Interactive.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\..\interactive\src\Microsoft.DotNet.Interactive.Formatting\Microsoft.DotNet.Interactive.Formatting.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\..\interactive\src\Microsoft.DotNet.Interactive.FSharp\Microsoft.DotNet.Interactive.FSharp.fsproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

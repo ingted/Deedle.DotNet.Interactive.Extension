@@ -9,9 +9,33 @@ open Microsoft.DotNet.Interactive.FSharp.FSharpKernelHelpers.Html
 open Deedle
 open Deedle.Internal
 
+type DeedleFormatterSettings private () =
+    static let mutable frameRowLimit: int option = Some 20
+    static let mutable frameColumnLimit: int option = Some 15
+
+    static member FrameRowLimit
+        with get () = frameRowLimit
+        and set value =
+            if value |> Option.exists (fun limit -> limit < 0) then
+                invalidArg "value" "FrameRowLimit must be None or a non-negative value."
+
+            frameRowLimit <- value
+
+    static member FrameColumnLimit
+        with get () = frameColumnLimit
+        and set value =
+            if value |> Option.exists (fun limit -> limit < 0) then
+                invalidArg "value" "FrameColumnLimit must be None or a non-negative value."
+
+            frameColumnLimit <- value
+
 type DeedleFormatterExtension() =
-    let maxRows = 20
-    let maxCols = 15
+    let maxSeriesValues = 15
+
+    let resolveLimit limit available =
+        match limit with
+        | None -> available
+        | Some value -> min value available
 
     let (|SeriesValues|_|) (value: obj) =
         let iser =
@@ -70,7 +94,7 @@ type DeedleFormatterExtension() =
                     $"Key type: %A{keyType}"
 
             let entries = Seq.length s
-            let toBeShown = Seq.take (min maxCols entries) s
+            let toBeShown = Seq.take (min maxSeriesValues entries) s
 
             div [] [
                 table [] [
@@ -84,7 +108,7 @@ type DeedleFormatterExtension() =
                                 toBeShown
                                 |> Seq.map (fun kvp -> th [] [ str (fst kvp |> string) ])
                                 |> eraseSeqType
-                            if entries > maxCols then
+                            if entries > maxSeriesValues then
                                 th [] [ str "..." ]
                         ]
                     ]
@@ -94,7 +118,7 @@ type DeedleFormatterExtension() =
                             toBeShown
                             |> Seq.map (fun kvp -> td [] [ str (snd kvp |> string) ])
                             |> eraseSeqType
-                        if entries > maxCols then
+                        if entries > maxSeriesValues then
                             th [] [ str "..." ]
                     ]
                 ]
@@ -113,9 +137,11 @@ type DeedleFormatterExtension() =
 
                     let rowCount = df.RowCount
                     let columnCount = keyRepresentations |> Seq.length
+                    let shownRowCount = resolveLimit DeedleFormatterSettings.FrameRowLimit rowCount
+                    let shownColumnCount = resolveLimit DeedleFormatterSettings.FrameColumnLimit columnCount
 
-                    let notShownRows = rowCount - maxRows |> max 0
-                    let notShownColumns = columnCount - maxCols |> max 0
+                    let notShownRows = rowCount - shownRowCount
+                    let notShownColumns = columnCount - shownColumnCount
 
                     let rowSummary =
                         if notShownRows < 1 then
@@ -128,7 +154,7 @@ type DeedleFormatterExtension() =
                             None
                         else
                             keysAndTypes
-                            |> Seq.skip maxCols
+                            |> Seq.skip shownColumnCount
                             |> Seq.map
                                 (fun (k, v) ->
                                     span [] [
@@ -168,20 +194,20 @@ type DeedleFormatterExtension() =
                                     th [] []
                                     yield!
                                         df.ColumnKeys
-                                        |> Seq.take (min maxCols columnCount)
+                                        |> Seq.take shownColumnCount
                                         |> Seq.map (fun ck -> th [] [ str (ck.ToString()) ])
                                         |> eraseSeqType
-                                    if maxCols < columnCount then
+                                    if shownColumnCount < columnCount then
                                         th [] [ str "..." ]
                                 ]
                                 tr [] [
                                     th [] []
                                     yield!
                                         df.ColumnTypes
-                                        |> Seq.take (min maxCols columnCount)
+                                        |> Seq.take shownColumnCount
                                         |> Seq.map (fun ct -> th [] [ ct |> string |> str ])
                                         |> eraseSeqType
-                                    if maxCols < columnCount then
+                                    if shownColumnCount < columnCount then
                                         th [] [ str "..." ]
                                 ]
                             ]
@@ -190,9 +216,9 @@ type DeedleFormatterExtension() =
                                     df
                                     |> Frame.sliceCols (
                                         df.ColumnKeys
-                                        |> Seq.take (min columnCount maxCols)
+                                        |> Seq.take shownColumnCount
                                     )
-                                    |> Frame.take (min maxRows rowCount)
+                                    |> Frame.take shownRowCount
                                     |> Frame.rows
                                     |> Series.observationsAll
                                     |> Seq.map
@@ -211,15 +237,15 @@ type DeedleFormatterExtension() =
                                             tr [] [
                                                 td [] [ embedNoContext k ]
                                                 yield! eraseSeqType row
-                                                if columnCount > maxCols then
+                                                if columnCount > shownColumnCount then
                                                     td [] [ str "..." ]
                                             ])
                                     |> eraseSeqType
-                                if rowCount > maxRows then
+                                if rowCount > shownRowCount then
                                     tr [] [
                                         yield!
                                             fun _ -> td [] [ str "..." ]
-                                            |> Seq.init ((min columnCount maxCols) + 1)
+                                            |> Seq.init (shownColumnCount + 1)
                                             |> eraseSeqType
                                     ]
                             ]
