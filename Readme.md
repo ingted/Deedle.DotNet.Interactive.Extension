@@ -4,7 +4,11 @@
 
 Repository: <https://github.com/ingted/Deedle.DotNet.Interactive.Extension>
 
-This package is built against the .NET 10 source projects in the companion [ingted/interactive](https://github.com/ingted/interactive) repository (local checkout: `G:\coldfar_py\interactive`).
+This package is built with .NET SDK 10.0.400 against the three .NET 10 source projects in the companion [ingted/interactive](https://github.com/ingted/interactive) repository (local checkout: `G:\coldfar_py\interactive`):
+
+- `Microsoft.DotNet.Interactive`
+- `Microsoft.DotNet.Interactive.Formatting`
+- `Microsoft.DotNet.Interactive.FSharp`
 
 ## Project status and support
 
@@ -14,12 +18,12 @@ Support is deliberately focused on F# and Deedle workflows. Compatibility or con
 
 ## Deployment
 
-Use the deployment instructions and maintained artifacts in [`interactive/自主版`](https://github.com/ingted/interactive/tree/main/%E8%87%AA%E4%B8%BB%E7%89%88) (local checkout: `G:\coldfar_py\interactive\自主版`). The current procedure is documented in [`自主版/deploy.txt`](https://github.com/ingted/interactive/blob/main/%E8%87%AA%E4%B8%BB%E7%89%88/deploy.txt).
+Use the deployment instructions and maintained artifacts in [`interactive/自主版`](https://github.com/ingted/interactive/tree/20260815_persistent_display_refresh/%E8%87%AA%E4%B8%BB%E7%89%88) (local checkout: `G:\coldfar_py\interactive\自主版`). `printDFFun` requires the patched `polyglot-net10-persistent-display-refresh.vsix`; the stock archived frontend does not listen for display updates after a cell has completed.
 
 ## Install
 
 ```fsharp
-#r "nuget: Deedle.DotNet.Interactive.Extension, 0.1.0-alpha14"
+#r "nuget: Deedle.DotNet.Interactive.Extension, 0.1.0-alpha15"
 
 open Deedle
 open Deedle.DotNet.Interactive.Extension
@@ -44,6 +48,8 @@ DeedleFormatterSettings.FrameColumnLimit <- None
 ## Refresh a frame in place
 
 `printDFFun intervalMilli f` calls `f` immediately to create the initial display. It then calls `f` at the requested interval and replaces the same cell output area with the newly rendered frame.
+
+The cell is executed once. After that, refreshes neither add notebook cells nor resubmit the cell code, and you do not need to press **Run** again.
 
 ```fsharp
 let dfTimer =
