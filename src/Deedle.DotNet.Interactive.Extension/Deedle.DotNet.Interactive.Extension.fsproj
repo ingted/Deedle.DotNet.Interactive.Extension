@@ -6,16 +6,21 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.1.0-alpha11</Version>
+    <Version>0.1.0-alpha12</Version>
     <IsPackable>true</IsPackable>
     <OutputType>Library</OutputType>
     <PackageDescription>Experimental Deedle formatters for dotnet interactive notebooks</PackageDescription>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/ingted/Deedle.DotNet.Interactive.Extension</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/ingted/Deedle.DotNet.Interactive.Extension</RepositoryUrl>
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5100</NoWarn><!-- dll outside of lib/ folder -->
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Formatting.fs" />
+    <Compile Include="DFPrint.fs" />
     <Compile Include="Extension.fs" />
   </ItemGroup>
 
@@ -38,5 +43,6 @@
 
   <ItemGroup>
     <None Include="$(OutputPath)/Deedle.DotNet.Interactive.Extension.dll" Pack="true" PackagePath="interactive-extensions/dotnet" />
+    <None Include="..\..\Readme.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

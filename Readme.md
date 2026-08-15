@@ -1,30 +1,49 @@
-# Deedle Formatting Extension For .NET Interactive
+# Deedle Formatting Extension for .NET Interactive
 
-This repo contains a MVP implementation of a possible Deelde `Series` and `Frame` formatter.
+`Deedle.DotNet.Interactive.Extension` renders Deedle `Frame` and `Series` values as HTML tables in .NET Interactive notebooks.
 
-## Demo Notebook
+Repository: <https://github.com/ingted/Deedle.DotNet.Interactive.Extension>
 
-The [Jupyter Notebook](DeedleFormatterTest.ipynb) documents how to build and include the package locally.
-Apart from that it shows how it renders `Series` and `Frame` objects and some ways to interface with
-other extension distributed in the `Microsoft.DotNet.Interactive.ExtensionLab` package.
+This package is built against the .NET 10 source projects in the companion [ingted/interactive](https://github.com/ingted/interactive) repository (local checkout: `G:\coldfar_py\interactive`).
 
-## Why don't the things render as I want them to?
+## Install
 
-You might be using .NET Interactive in "stable" Visual Studio Code. Please go and download the insiders version
-and try again.
+```fsharp
+#r "nuget: Deedle.DotNet.Interactive.Extension, 0.1.0-alpha12"
 
-## How to get these bits? Gimme!
-
-I have a feed for experimental packages [on MyGet](https://www.myget.org/feed/Packages/gregs-experimental-packages) there you can find the
-[Deedle.DotNet.Interactive.Extension](https://www.myget.org/feed/gregs-experimental-packages/package/nuget/Deedle.DotNet.Interactive.Extension).
-Add the feed to your NuGet source list and reference the extension in your notebook. The following example also shows how to include the
-addional nuget source directly into your notebook cell before loading the package.
-
-```
-#i "nuget:https://www.myget.org/F/gregs-experimental-packages/api/v3/index.json"
-#r "nuget: Deedle.DotNet.Interactive.Extension,0.1.0-alpha9
+open Deedle
+open Deedle.DotNet.Interactive.Extension
 ```
 
-## Something blew up!
+## Configure frame size
 
-Great, you found a bug 🐛 Please add an issue and I'll take a look at it 🙇‍♂️
+The limits are mutable process-wide settings. Once changed, later renders use the new values until they are changed again.
+
+```fsharp
+DeedleFormatterSettings.FrameRowLimit <- Some 100
+DeedleFormatterSettings.FrameColumnLimit <- Some 30
+```
+
+Use `None` to render every row or column:
+
+```fsharp
+DeedleFormatterSettings.FrameRowLimit <- None
+DeedleFormatterSettings.FrameColumnLimit <- None
+```
+
+## Refresh a frame in place
+
+`printDFFun intervalMilli f` calls `f` immediately to create the initial display. It then calls `f` at the requested interval and replaces the same cell output area with the newly rendered frame.
+
+```fsharp
+let dfTimer =
+    printDFFun 1000 (fun () -> currentFrame)
+```
+
+Keep the returned `System.Threading.Timer` in a binding for as long as updates are needed. Dispose it to stop refreshing:
+
+```fsharp
+dfTimer.Dispose()
+```
+
+If one refresh is still running when the next interval arrives, the overlapping refresh is skipped. If `f` throws, the error is shown in the same output area and a later successful refresh can replace it.
