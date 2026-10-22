@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="../interactive/src/dotnet-dib/dotnet-dib.csproj" />
+    <Project Path="../interactive/src/Microsoft.DotNet.Interactive.Formatting/Microsoft.DotNet.Interactive.Formatting.csproj" />
+    <Project Path="../interactive/src/Microsoft.DotNet.Interactive.FSharp/Microsoft.DotNet.Interactive.FSharp.fsproj" />
+    <Project Path="../interactive/src/Microsoft.DotNet.Interactive/Microsoft.DotNet.Interactive.csproj" />
+    <Project Path="src/Deedle.DotNet.Interactive.Extension/Deedle.DotNet.Interactive.Extension.fsproj" />
+  </Folder>
+</Solution>
